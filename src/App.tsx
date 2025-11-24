@@ -13,6 +13,8 @@ import SearchBuses from "./pages/user/SearchBuses";
 import AdminDashboard from "./pages/admin/Dashboard";
 import BusManagement from "./pages/admin/BusManagement";
 import BookingManagement from "./pages/admin/BookingManagement";
+import CustomerManagement from "./pages/admin/CustomerManagement";
+import PaymentManagement from "./pages/admin/PaymentManagement";
 import BusResults from "./pages/user/BusResults";
 import SeatSelection from "./pages/user/SeatSelection";
 import Payment from "./pages/user/Payment";
@@ -39,9 +41,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={
-        user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/search" replace />) : <Navigate to="/login" replace />
-      } />
+      <Route path="/" element={<Index />} />
       <Route path="/login" element={user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/search" replace />) : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/search" replace /> : <Signup />} />
       <Route path="/search" element={<ProtectedRoute><SearchBuses /></ProtectedRoute>} />
@@ -52,6 +52,8 @@ const AppRoutes = () => {
       <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/buses" element={<ProtectedRoute adminOnly><BusManagement /></ProtectedRoute>} />
       <Route path="/admin/bookings" element={<ProtectedRoute adminOnly><BookingManagement /></ProtectedRoute>} />
+      <Route path="/admin/customers" element={<ProtectedRoute adminOnly><CustomerManagement /></ProtectedRoute>} />
+      <Route path="/admin/payments" element={<ProtectedRoute adminOnly><PaymentManagement /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
