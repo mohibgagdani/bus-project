@@ -36,6 +36,12 @@ const BookingManagement = () => {
             <Button variant="ghost" onClick={() => navigate('/admin/bookings')}>
               Bookings
             </Button>
+            <Button variant="ghost" onClick={() => navigate('/admin/customers')}>
+              Customers
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/admin/payments')}>
+              Payments
+            </Button>
             <ThemeToggle />
           </div>
         </div>
