@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@/types';
-import { getCurrentUser, setCurrentUser, getUsers, addUser, initializeDefaultAdmin } from '@/lib/storage';
+import { getCurrentUser, setCurrentUser, getUsers, addUser, initializeDefaultAdmin, initializeSampleData } from '@/lib/storage';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
@@ -19,6 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     initializeDefaultAdmin();
+    initializeSampleData();
     const currentUser = getCurrentUser();
     if (currentUser) {
       setUser(currentUser);

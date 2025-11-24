@@ -103,6 +103,22 @@ const Dashboard = () => {
                 <Receipt className="h-4 w-4 mr-2" />
                 View Bookings
               </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => navigate('/admin/customers')}
+              >
+                <Bus className="h-4 w-4 mr-2" />
+                Manage Customers
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => navigate('/admin/payments')}
+              >
+                <Receipt className="h-4 w-4 mr-2" />
+                View Payments
+              </Button>
             </CardContent>
           </Card>
 
