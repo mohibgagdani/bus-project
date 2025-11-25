@@ -24,7 +24,10 @@ const Dashboard = () => {
               Dashboard
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/buses')}>
-              Bus Management
+              Buses
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/admin/schedule')}>
+              Schedule
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/bookings')}>
               Bookings
@@ -94,6 +97,14 @@ const Dashboard = () => {
               >
                 <Bus className="h-4 w-4 mr-2" />
                 Manage Buses
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => navigate('/admin/schedule')}
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Bus Schedules
               </Button>
               <Button
                 variant="outline"

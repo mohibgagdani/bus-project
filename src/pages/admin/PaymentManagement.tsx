@@ -76,7 +76,10 @@ const PaymentManagement = () => {
               Dashboard
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/buses')}>
-              Bus Management
+              Buses
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/admin/schedule')}>
+              Schedule
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/bookings')}>
               Bookings

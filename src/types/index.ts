@@ -20,6 +20,8 @@ export interface Bus {
   price: number;
   totalSeats: number;
   seatLayout: SeatLayout;
+  operatingDays?: string[];
+  availableDates?: string[];
 }
 
 export interface SeatLayout {

@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/user/ForgotPassword";
 import SearchBuses from "./pages/user/SearchBuses";
 import AdminDashboard from "./pages/admin/Dashboard";
 import BusManagement from "./pages/admin/BusManagement";
+import BusSchedule from "./pages/admin/BusSchedule";
 import BookingManagement from "./pages/admin/BookingManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
 import PaymentManagement from "./pages/admin/PaymentManagement";
@@ -55,6 +56,7 @@ const AppRoutes = () => {
       <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/buses" element={<ProtectedRoute adminOnly><BusManagement /></ProtectedRoute>} />
+      <Route path="/admin/schedule" element={<ProtectedRoute adminOnly><BusSchedule /></ProtectedRoute>} />
       <Route path="/admin/bookings" element={<ProtectedRoute adminOnly><BookingManagement /></ProtectedRoute>} />
       <Route path="/admin/customers" element={<ProtectedRoute adminOnly><CustomerManagement /></ProtectedRoute>} />
       <Route path="/admin/payments" element={<ProtectedRoute adminOnly><PaymentManagement /></ProtectedRoute>} />

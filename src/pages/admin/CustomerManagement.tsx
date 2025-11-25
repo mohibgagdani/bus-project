@@ -3,18 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { getUsers, getBookings } from '@/lib/storage';
+import { getUsers, getBookings, addUser, updateUser, deleteUser } from '@/lib/storage';
 import { User, Booking } from '@/types';
-import { Bus, Search } from 'lucide-react';
+import { Bus, Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const CustomerManagement = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
 
   useEffect(() => {
     loadData();
@@ -25,6 +36,57 @@ const CustomerManagement = () => {
     const allBookings = getBookings();
     setUsers(allUsers);
     setBookings(allBookings);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingUser) {
+      updateUser(editingUser.id, {
+        name: formData.name,
+        email: formData.email,
+        ...(formData.password ? { password: formData.password } : {})
+      });
+      toast({ title: "User Updated", description: "Customer updated successfully" });
+    } else {
+      const newUser: User = {
+        id: `user-${Date.now()}`,
+        email: formData.email,
+        name: formData.name,
+        role: 'user',
+        emailVerified: true,
+        password: formData.password,
+      };
+      addUser(newUser);
+      toast({ title: "User Added", description: "New customer added successfully" });
+    }
+    
+    loadData();
+    resetForm();
+    setIsDialogOpen(false);
+  };
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      name: user.name,
+      email: user.email,
+      password: '',
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = (userId: string) => {
+    if (confirm('Are you sure you want to delete this customer?')) {
+      deleteUser(userId);
+      toast({ title: "User Deleted", description: "Customer deleted successfully" });
+      loadData();
+    }
+  };
+
+  const resetForm = () => {
+    setEditingUser(null);
+    setFormData({ name: '', email: '', password: '' });
   };
 
   const getUserBookings = (userId: string) => {
@@ -55,7 +117,10 @@ const CustomerManagement = () => {
               Dashboard
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/buses')}>
-              Bus Management
+              Buses
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/admin/schedule')}>
+              Schedule
             </Button>
             <Button variant="ghost" onClick={() => navigate('/admin/bookings')}>
               Bookings
@@ -72,9 +137,61 @@ const CustomerManagement = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 animate-fade-in">
-          <h2 className="text-3xl font-bold mb-2">Customer Management</h2>
-          <p className="text-muted-foreground">Manage and view customer information</p>
+        <div className="mb-8 flex items-center justify-between animate-fade-in">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">Customer Management</h2>
+            <p className="text-muted-foreground">Manage and view customer information</p>
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) resetForm();
+          }}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{editingUser ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password {editingUser && '(leave blank to keep current)'}</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    required={!editingUser}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingUser ? 'Update Customer' : 'Add Customer'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <Card className="mb-6">
@@ -109,6 +226,7 @@ const CustomerManagement = () => {
                     <TableHead>Active Bookings</TableHead>
                     <TableHead>Total Spent</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,6 +246,16 @@ const CustomerManagement = () => {
                           <Badge variant={activeBookings > 0 ? "default" : "secondary"}>
                             {activeBookings > 0 ? "Active" : "Inactive"}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="icon" onClick={() => handleEdit(user)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="destructive" size="icon" onClick={() => handleDelete(user.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
