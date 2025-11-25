@@ -194,6 +194,20 @@ export const addUser = (user: User): void => {
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
 };
 
+export const updateUser = (id: string, updatedUser: Partial<User>): void => {
+  const users = getUsers();
+  const index = users.findIndex(u => u.id === id);
+  if (index !== -1) {
+    users[index] = { ...users[index], ...updatedUser };
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+  }
+};
+
+export const deleteUser = (id: string): void => {
+  const users = getUsers().filter(u => u.id !== id);
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+};
+
 export const getCurrentUser = (): User | null => {
   const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
   return data ? JSON.parse(data) : null;
