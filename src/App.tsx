@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/user/Login";
 import Signup from "./pages/user/Signup";
+import VerifyEmail from "./pages/user/VerifyEmail";
+import ForgotPassword from "./pages/user/ForgotPassword";
 import SearchBuses from "./pages/user/SearchBuses";
 import AdminDashboard from "./pages/admin/Dashboard";
 import BusManagement from "./pages/admin/BusManagement";
@@ -44,6 +46,8 @@ const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/login" element={user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/search" replace />) : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/search" replace /> : <Signup />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/search" element={<ProtectedRoute><SearchBuses /></ProtectedRoute>} />
       <Route path="/buses" element={<ProtectedRoute><BusResults /></ProtectedRoute>} />
       <Route path="/seats" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />

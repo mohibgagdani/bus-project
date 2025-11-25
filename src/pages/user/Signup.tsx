@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Bus } from 'lucide-react';
+import { createVerificationCode } from '@/lib/storage';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,8 @@ const Signup = () => {
     e.preventDefault();
     const success = await signup(email, password, name);
     if (success) {
-      navigate('/search');
+      const verificationCode = createVerificationCode(email);
+      navigate('/verify-email', { state: { email } });
     }
   };
 
