@@ -6,6 +6,8 @@ const STORAGE_KEYS = {
   BOOKINGS: 'bus_app_bookings',
   CURRENT_USER: 'bus_app_current_user',
   THEME: 'bus_app_theme',
+  VERIFICATION_CODES: 'bus_app_verification_codes',
+  RESET_CODES: 'bus_app_reset_codes',
 };
 
 // Initialize default admin and sample data
@@ -264,4 +266,133 @@ export const getTheme = (): string => {
 
 export const setTheme = (theme: string): void => {
   localStorage.setItem(STORAGE_KEYS.THEME, theme);
+};
+
+// Email Verification Functions
+interface VerificationCode {
+  email: string;
+  code: string;
+  timestamp: number;
+}
+
+const generateCode = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+export const createVerificationCode = (email: string): string => {
+  const codes: VerificationCode[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.VERIFICATION_CODES) || '[]'
+  );
+  
+  const code = generateCode();
+  const newCode: VerificationCode = {
+    email,
+    code,
+    timestamp: Date.now(),
+  };
+  
+  // Remove existing codes for this email
+  const filteredCodes = codes.filter(c => c.email !== email);
+  filteredCodes.push(newCode);
+  
+  localStorage.setItem(STORAGE_KEYS.VERIFICATION_CODES, JSON.stringify(filteredCodes));
+  return code;
+};
+
+export const verifyEmailCode = (email: string, code: string): boolean => {
+  const codes: VerificationCode[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.VERIFICATION_CODES) || '[]'
+  );
+  
+  const userCode = codes.find(c => c.email === email && c.code === code);
+  if (!userCode) return false;
+  
+  // Code expires after 10 minutes
+  const isExpired = Date.now() - userCode.timestamp > 10 * 60 * 1000;
+  if (isExpired) return false;
+  
+  // Mark user as verified
+  const users = getUsers();
+  const user = users.find(u => u.email === email);
+  if (user) {
+    user.emailVerified = true;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+  }
+  
+  // Remove the used code
+  const filteredCodes = codes.filter(c => c.email !== email);
+  localStorage.setItem(STORAGE_KEYS.VERIFICATION_CODES, JSON.stringify(filteredCodes));
+  
+  return true;
+};
+
+export const resendVerificationCode = (email: string): string => {
+  return createVerificationCode(email);
+};
+
+// Password Reset Functions
+interface ResetCode {
+  email: string;
+  code: string;
+  timestamp: number;
+}
+
+export const requestPasswordReset = (email: string): string | null => {
+  const users = getUsers();
+  const user = users.find(u => u.email === email);
+  
+  if (!user) return null;
+  
+  const codes: ResetCode[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.RESET_CODES) || '[]'
+  );
+  
+  const code = generateCode();
+  const newCode: ResetCode = {
+    email,
+    code,
+    timestamp: Date.now(),
+  };
+  
+  // Remove existing codes for this email
+  const filteredCodes = codes.filter(c => c.email !== email);
+  filteredCodes.push(newCode);
+  
+  localStorage.setItem(STORAGE_KEYS.RESET_CODES, JSON.stringify(filteredCodes));
+  return code;
+};
+
+export const verifyResetCode = (email: string, code: string): boolean => {
+  const codes: ResetCode[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.RESET_CODES) || '[]'
+  );
+  
+  const resetCode = codes.find(c => c.email === email && c.code === code);
+  if (!resetCode) return false;
+  
+  // Code expires after 10 minutes
+  const isExpired = Date.now() - resetCode.timestamp > 10 * 60 * 1000;
+  return !isExpired;
+};
+
+export const resetPassword = (email: string, code: string, newPassword: string): boolean => {
+  if (!verifyResetCode(email, code)) return false;
+  
+  const users = getUsers();
+  const user = users.find(u => u.email === email);
+  
+  if (!user) return false;
+  
+  // In a real app, hash the password
+  user.password = newPassword;
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+  
+  // Remove the used code
+  const codes: ResetCode[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.RESET_CODES) || '[]'
+  );
+  const filteredCodes = codes.filter(c => c.email !== email);
+  localStorage.setItem(STORAGE_KEYS.RESET_CODES, JSON.stringify(filteredCodes));
+  
+  return true;
 };

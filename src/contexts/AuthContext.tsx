@@ -43,9 +43,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Check for regular users (simplified password check - in real app use proper hashing)
-    const foundUser = users.find(u => u.email === email && u.role === 'user');
+    // Check for regular users
+    const foundUser = users.find(u => u.email === email && u.role === 'user' && u.password === password);
     if (foundUser) {
+      // Check if email is verified
+      if (!foundUser.emailVerified) {
+        toast({
+          title: "Email Not Verified",
+          description: "Please verify your email before logging in.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       setUser(foundUser);
       setCurrentUser(foundUser);
       toast({
@@ -80,15 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       name,
       role: 'user',
+      emailVerified: false,
+      password,
     };
 
     addUser(newUser);
-    setUser(newUser);
-    setCurrentUser(newUser);
     
     toast({
-      title: "Signup Successful",
-      description: "Welcome to Bus Booking!",
+      title: "Account Created",
+      description: "Please verify your email to continue.",
     });
     
     return true;

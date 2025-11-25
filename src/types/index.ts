@@ -3,6 +3,8 @@ export interface User {
   email: string;
   name: string;
   role: 'admin' | 'user';
+  emailVerified?: boolean;
+  password?: string;
 }
 
 export interface Bus {
