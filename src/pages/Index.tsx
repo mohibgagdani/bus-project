@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { getBuses } from '@/lib/storage';
+import { getBuses, initializeSampleData } from '@/lib/storage';
 import { Bus } from '@/types';
 import { MapPin, Clock, IndianRupee, Bus as BusIcon } from 'lucide-react';
 
@@ -14,7 +14,6 @@ const Index = () => {
 
   useEffect(() => {
     // Initialize sample data on first load
-    const { initializeSampleData } = require('@/lib/storage');
     initializeSampleData();
     
     const allBuses = getBuses();
